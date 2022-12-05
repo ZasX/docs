@@ -6,9 +6,9 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "Docs by Stavros",
+  title: "Docs by ZasX",
   tagline: "Dinosaurs are cool",
-  url: "https://docs.kois.cc/",
+  url: "https://docs.zasx.eu/",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -16,7 +16,7 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "stavros-k", // Usually your GitHub org/user name.
+  organizationName: "ZasX", // Usually your GitHub org/user name.
   projectName: "docs", // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
@@ -37,7 +37,7 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/stavros-k/docs/tree/master/",
+          editUrl: "https://github.com/ZasX/docs/tree/master/",
         },
         blog: false,
         theme: {
@@ -78,7 +78,7 @@ const config = {
         },
       },
       navbar: {
-        title: "Docs by Stavros",
+        title: "Docs by ZasX",
         logo: {
           alt: "My Site Logo",
           src: "img/logo.svg",
@@ -91,7 +91,7 @@ const config = {
             label: "Documentation",
           },
           {
-            href: "https://github.com/stavros-k/docs",
+            href: "https://github.com/ZasX/docs",
             label: "GitHub",
             position: "right",
           },
@@ -120,10 +120,10 @@ const config = {
               //   label: 'Discord',
               //   href: 'https://discordapp.com/invite/docusaurus',
               // },
-              {
-                label: "Twitter",
-                href: "https://twitter.com/stavroskois",
-              },
+              // {
+              //   label: "Twitter",
+              //   href: "https://twitter.com/stavroskois",
+              // },
             ],
           },
           {
@@ -131,12 +131,12 @@ const config = {
             items: [
               {
                 label: "GitHub",
-                href: "https://github.com/stavros-k/docs",
+                href: "https://github.com/ZasX/docs",
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Docs by Stavros, Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Docs by ZasX, Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
