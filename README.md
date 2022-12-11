@@ -1,7 +1,7 @@
 # Documentation
 
-PR's are always welcome, to add, improve or even correct things.
+I welcome pull requests to add, improve, or correct anything on this website.
 
-I'm no expert on anything here. SO use at your own risk
+Please note that I am not an expert on the topics discussed here, so use this information at your own risk.
 
-This is just some docs I wrote myself for things I've done over the years.
+This website contains notes that I have written for myself based on my experiences over the years.
