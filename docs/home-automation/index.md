@@ -1,3 +1,3 @@
 # Home Automation
 
-This section will include guides around home automation
+This section will include guides around home automation.
