@@ -39,7 +39,7 @@ For apps installed with a different name, it will be `<app-name>-<default-name>`
 
 So for `vaultwarden` (the default name), it will be `vaultwarden`. But for the vaultwarden app that was installed with the name `testwarden`, it will be `testwarden-vaultwarden`.
 
-:::caution Replace the names in <> before executing commands
+:::caution Replace the names in the angle brackets before executing commands
 
 ```bash
 k3s kubectl scale deploy <app-name>-<default-name> -n ix-<app-name> --replicas=0
@@ -107,14 +107,24 @@ On the 2nd tab page, select the first 3 options (`Pre-data`, `Data` and `Post-da
 
 ## Migrate the PVC's
 
-The following command will return the data PVC's for the old and the new install
+The following commands will return the PVC's for the old and the new install. 
 
 ```bash
-k3s kubectl get pvc -A | grep warden-data | sort -u | awk '{print $1, $2, $4}' | column -t
-zfs list | grep warden | grep legacy
+k3s kubectl get pvc -n ix-vaultwarden
+k3s kubectl get pvc -n ix-testwarden
+
+zfs list | grep pvc | grep legacy
 ```
 
+Copy the full zfs paths to a text editor.
+
 Destroy the PVC of the new app and replicate the PVC of the old app to the new location.
+
+:::danger
+
+Make sure you're not mixing up the old app and the new app here. Destroy the *NEW* PVC. The old PVC contains your data.
+
+:::
 
 ```bash
 zfs destroy new-pvc
