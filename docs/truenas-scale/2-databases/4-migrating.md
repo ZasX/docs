@@ -107,18 +107,30 @@ On the 2nd tab page, select the first 3 options (`Pre-data`, `Data` and `Post-da
 
 ## Migrate the PVC's
 
+### Get the PVC's names and paths
+
 The following commands will return the PVC's for the old and the new install. 
 
 ```bash
 k3s kubectl get pvc -n ix-vaultwarden
 k3s kubectl get pvc -n ix-testwarden
+```
 
+Take note of all the PVC's that do not contain `postgres`, `redis` or `cnpg`. `vaultwarden` only has 1 data PVC. There are apps that have more than 1. You'll want to migrate them all.
+
+Now, find the full paths to all these PVC's.
+
+```bash
 zfs list | grep pvc | grep legacy
 ```
 
-Copy the full zfs paths to a text editor.
+If this returns a very long list, you can add ` | grep <app-name>` to filter for only the PVC's of the app you're currently working on.
 
-Destroy the PVC of the new app and replicate the PVC of the old app to the new location.
+A full PVC path looks something like this: `poolname/ix-applications/releases/app-name/volumes/pvc-32341f93-0647-4bf9-aab1-e09b3ebbd2b3`.
+
+### Destroy new PVC and copy over old PVC
+
+Destroy the PVC's of the new app and replicate the PVC of the old app to the new location.
 
 :::danger
 
@@ -137,13 +149,43 @@ The `new-pvc` will look something like `poolname/ix-applications/releases/testwa
 
 The `old-pvc` will look something like `poolname/ix-applications/releases/vaultwarden/volumes/pvc-40275e0e-5f99-4052-96f1-63e26be01236`.
 
+Example of all commands in one go:
+
+```bash
+root@truenasvm[~]# k3s kubectl get pvc -n ix-vaultwarden
+NAME                          STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS                   AGE
+vaultwarden-data              Bound    pvc-33646e70-ccaa-464c-b315-64b24fcd9e83   256Gi      RWO            ix-storage-class-vaultwarden   4h27m
+db-vaultwarden-postgresql-0   Bound    pvc-5b3aa878-0b76-4022-8542-b82cd3fdcf71   999Gi      RWO            ix-storage-class-vaultwarden   4h27m
+root@truenasvm[~]# k3s kubectl get pvc -n ix-testwarden 
+NAME                                     STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS                  AGE
+testwarden-vaultwarden-data              Bound    pvc-e56982a7-e2c7-4b98-b875-5612d92506fd   256Gi      RWO            ix-storage-class-testwarden   4h18m
+testwarden-vaultwarden-cnpg-main-1       Bound    pvc-bed595ad-74f1-4828-84c7-764693785630   256Gi      RWO            ix-storage-class-testwarden   4h18m
+testwarden-vaultwarden-cnpg-main-1-wal   Bound    pvc-79d46775-f60b-4dc6-99a3-1a63d26cd171   256Gi      RWO            ix-storage-class-testwarden   4h18m
+testwarden-vaultwarden-cnpg-main-2       Bound    pvc-dbc6501a-bfac-4a95-81a2-c05c5b28b5ff   256Gi      RWO            ix-storage-class-testwarden   4h18m
+testwarden-vaultwarden-cnpg-main-2-wal   Bound    pvc-331f5cf3-5f39-4567-83f7-3700d4f582db   256Gi      RWO            ix-storage-class-testwarden   4h18m
+root@truenasvm[~]# zfs list | grep pvc | grep legacy | grep warden
+tank/ix-applications/releases/testwarden/volumes/pvc-331f5cf3-5f39-4567-83f7-3700d4f582db    1.10M  25.1G     1.10M  legacy
+tank/ix-applications/releases/testwarden/volumes/pvc-79d46775-f60b-4dc6-99a3-1a63d26cd171    4.72M  25.1G     4.72M  legacy
+tank/ix-applications/releases/testwarden/volumes/pvc-bed595ad-74f1-4828-84c7-764693785630    8.67M  25.1G     8.67M  legacy
+tank/ix-applications/releases/testwarden/volumes/pvc-dbc6501a-bfac-4a95-81a2-c05c5b28b5ff    8.64M  25.1G     8.64M  legacy
+tank/ix-applications/releases/testwarden/volumes/pvc-e56982a7-e2c7-4b98-b875-5612d92506fd     112K  25.1G      112K  legacy
+tank/ix-applications/releases/vaultwarden/volumes/pvc-33646e70-ccaa-464c-b315-64b24fcd9e83    112K  25.1G      112K  legacy
+tank/ix-applications/releases/vaultwarden/volumes/pvc-5b3aa878-0b76-4022-8542-b82cd3fdcf71   12.8M  25.1G     12.8M  legacy
+root@truenasvm[~]# zfs destroy tank/ix-applications/releases/testwarden/volumes/pvc-e56982a7-e2c7-4b98-b875-5612d92506fd
+root@truenasvm[~]# zfs snapshot tank/ix-applications/releases/vaultwarden/volumes/pvc-33646e70-ccaa-464c-b315-64b24fcd9e83@migrate
+root@truenasvm[~]# zfs send tank/ix-applications/releases/vaultwarden/volumes/pvc-33646e70-ccaa-464c-b315-64b24fcd9e83@migrate | zfs recv tank/ix-applications/releases/testwarden/volumes/pvc-e56982a7-e2c7-4b98-b875-5612d92506fd@migrate
+root@truenasvm[~]# zfs set mountpoint=legacy tank/ix-applications/releases/testwarden/volumes/pvc-e56982a7-e2c7-4b98-b875-5612d92506fd
+```
+
 ## Scale up both apps
+
+Use the same commands from the scaling down step, but replace the 0 with a 1.
 
 ```bash
 k3s kubectl scale deploy testwarden-vaultwarden -n ix-testwarden --replicas=1
 k3s kubectl scale deploy vaultwarden -n ix-vaultwarden --replicas=1
 ```
 
-## Reflection
+## Conclusion
 
 You should now be able to log in on the new install.
