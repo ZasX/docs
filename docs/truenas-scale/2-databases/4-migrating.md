@@ -67,9 +67,9 @@ You can skip this section if the app in question doesn't have a Postgresql datab
 
 If the app uses a Postgresql database, we need to make a backup and restore that backup to the new app's database.
 
-:::note Prerequisits
+:::note Requirements
 
-Make sure you have `pgadmin` installed, as we'll be using it to make a backup and to restore the database. It's a TrueCharts app from the stable train. You can install it with all default settings, and it will work.
+Make sure you have `pgAdmin` installed, as we'll be using it to make a backup and to restore the database. It's a TrueCharts app from the stable train. You can install it with all default settings, and it will work.
 
 Also make sure you have the database info script (`tcdbinfo.sh`) available on your server.
 
@@ -91,46 +91,46 @@ Also make sure you have the database info script (`tcdbinfo.sh`) available on yo
   </div>
 </details>
 
-### Configure database connections in pgadmin
+### Configure database connections in pgAdmin
 
-run the tcdbinfo.sh script to see the connection details for both the old and the new database, and set them up in pgadmin.
+run the tcdbinfo.sh script to see the connection details for both the old and the new database, and set them up in pgAdmin.
 
-### Create database backup
+### Create database Backup
 
-In `pgadmin`, right click `vaultwarden->Databases->vaultwarden` and click `Backup...`. Give the file a name (e.g. `vaultwarden.sql`) and click `Backup`.
+In `pgAdmin`, right click `vaultwarden->Databases->vaultwarden` and click `Backup...`. Give the file a name (e.g. `vaultwarden.sql`) and click `Backup`.
 
 ### Restore database backup
 
-In `pgadmin`, right click `testwarden->Databases->vaultwarden` and click `Restore...`. Select the sql file (`vaultwarden.sql`).
+In `pgAdmin`, right click `testwarden->Databases->vaultwarden` and click `Restore...`. Select the sql file (`vaultwarden.sql`).
 
 On the 2nd tab page, select the first 3 options (`Pre-data`, `Data` and `Post-data`). On the last tab, select `Clean before restore`. Now click `Restore`.
 
-## Migrate the PVC's
+## Migrate the PVCs
 
-### Get the PVC's names and paths
+### Get the PVCs names and paths
 
-The following commands will return the PVC's for the old and the new install. 
+The following commands will return the PVCs for the old and the new install. 
 
 ```bash
 k3s kubectl get pvc -n ix-vaultwarden
 k3s kubectl get pvc -n ix-testwarden
 ```
 
-Take note of all the PVC's that do not contain `postgres`, `redis` or `cnpg`. `vaultwarden` only has 1 data PVC. There are apps that have more than 1. You'll want to migrate them all.
+Take note of all the PVCs that do not contain `postgres`, `redis` or `cnpg`. `vaultwarden` only has 1 data PVC. There are apps that have more than 1. You'll want to migrate them all.
 
-Now, find the full paths to all these PVC's.
+Now, find the full paths to all these PVCs.
 
 ```bash
 zfs list | grep pvc | grep legacy
 ```
 
-If this returns a very long list, you can add ` | grep <app-name>` to filter for only the PVC's of the app you're currently working on.
+If this returns a very long list, you can add ` | grep <app-name>` to filter for only the PVCs of the app you're currently working on.
 
 A full PVC path looks something like this: `poolname/ix-applications/releases/app-name/volumes/pvc-32341f93-0647-4bf9-aab1-e09b3ebbd2b3`.
 
 ### Destroy new PVC and copy over old PVC
 
-Destroy the PVC's of the new app and replicate the PVC of the old app to the new location.
+Destroy the PVCs of the new app and replicate the PVC of the old app to the new location.
 
 :::danger
 
