@@ -6,15 +6,15 @@ Before proceeding, ensure that you have backed up important configurations, espe
 
 :::
 
-For a comprehensive guide and additional details, refer to the [upstream documentation](https://github.com/dani-garcia/vaultwarden/wiki/Enabling-admin-page#disabling-the-admin-page).
+This guide is a combination of the [upstream documentation](https://github.com/dani-garcia/vaultwarden/wiki/Enabling-admin-page#disabling-the-admin-page) and how we implemented it.
 
 ## Modify the Host Secret
 
 To start with the deactivation, you must first modify the secret on the host's shell. Execute the following command:
 
-\```
+```bash
 k3s kubectl patch secret vaultwarden-vaultwardensecret -n ix-vaultwarden --type='json' -p='[{"op": "remove", "path": "/data/ADMIN_TOKEN"}]'
-\```
+```
 
 :::info Command Explanation
 
@@ -32,9 +32,9 @@ The command above utilizes `kubectl`, a command-line tool for interacting with K
 
 Next, while inside the Vaultwarden container, run the command below to modify the `config.json` file:
 
-\```
+```bash
 sed -i.bak '/admin_token/d' /data/config.json
-\```
+```
 
 :::info Command Explanation
 
